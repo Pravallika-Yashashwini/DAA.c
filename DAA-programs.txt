@@ -222,92 +222,36 @@ int main()
 -----------------------------------------------------------------------
 0/1 KNAPSACK:
 
-#include<stdio.h>
+#include <stdio.h>
 
-struct st
+int max(int a, int b) { return (a > b) ? a : b; }
+
+int knapSack(int W, int wt[], int val[], int n)
 {
-    int weight,value;
-};
+	if (n == 0 || W == 0)
+		return 0;
+
+		if (wt[n - 1] > W)
+		return knapSack(W, wt, val, n - 1);
+
+	else
+		return max(
+			val[n - 1]
+				+ knapSack(W - wt[n - 1],
+						wt, val, n - 1),
+			knapSack(W, wt, val, n - 1));
+}
 
 int main()
 {
-   int n,i,j,k,W;
-   int b[100][101];
-   struct st pairof[1000],t;
-   printf("Enter number of items\n");
-   scanf("%d",&n);
-   printf("Enter the weight of Knapsack\n");
-   scanf("%d",&W);
-   printf("Enter %d items\n",n);
-   for(i=0;i<n;i++)
-   {
-       printf("Enter weight of an item");
-       scanf("%d",&pairof[i].weight);
-       
-       printf("Enter value of the item");
-       scanf("%d",&pairof[i].value);
-   }
-   for(i=0;i<n;i++)
-   {
-       for(j=i+1;j<n;j++)
-       {
-           if(pairof[i].weight>pairof[j].weight)
-           {
-               t=pairof[i];
-               pairof[i]=pairof[j];
-               pairof[j]=t;
-           }
-       }
-   }
-   for(j=0;j<=W;j++)
-   {
-        b[0][j]=0;
-   }
-   for(j=0;j<=n;j++)
-   {
-        b[j][0]=0;
-   }
-   printf("\n");
-   for(i=1;i<=n;i++)
-   {
-       for(j=1;j<=W;j++)
-       {
-           if(pairof[i-1].weight>j)
-           {
-               b[i][j]=b[i-1][j];
-           }
-           else
-           {
-               if(b[i-1][j]>b[i-1][j-pairof[i-1].weight]+pairof[i-1].value)
-               {
-                   b[i][j]=b[i-1][j];
-               }
-               else
-               {
-                   b[i][j]=b[i-1][j-pairof[i-1].weight]+pairof[i-1].value;
-               }
-           }
-       }
-   }
-   i=n;
-   for(j=W;j>0;)
-   { 
-       if(i==0)
-            break;
-        if(b[i ][j]==b[i-1][j])
-        { 
-               i--;
-         } 
-         else 
-         { 
-               printf("%d ",pairof[i-1].weight); 
-               j=j-pairof[i-1].weight;
-               i--; 
-         }
-   }
-   printf("\n%d\n",b[n][W]);
-   return 0;
+	int val[] = { 60, 100, 120 };
+	int wt[] = { 10, 20, 30 };
+	int W = 50;
+	int n = sizeof(val) / sizeof(val[0]);
+	printf("%d", knapSack(W, wt, val, n));
+	return 0;
 }
+
 ----------------------------------------------------------------------------
 TSP PROBLEM:
 #include<stdio.h>
