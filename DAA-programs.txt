@@ -1,0 +1,530 @@
+HUFFMAN:
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_TREE_HT 100
+
+struct MinHeapNode {
+    char data;
+    unsigned freq;
+    struct MinHeapNode *left, *right;
+};
+
+struct MinHeap {
+    unsigned size;
+    unsigned capacity;
+    struct MinHeapNode** array;
+};
+struct MinHeapNode* newNode(char data, unsigned freq)
+{
+    struct MinHeapNode* temp = (struct MinHeapNode*)malloc(
+        sizeof(struct MinHeapNode));
+
+    temp->left = temp->right = NULL;
+    temp->data = data;
+    temp->freq = freq;
+
+    return temp;
+}
+
+struct MinHeap* createMinHeap(unsigned capacity)
+
+{
+
+    struct MinHeap* minHeap
+        = (struct MinHeap*)malloc(sizeof(struct MinHeap));
+    minHeap->size = 0;
+
+    minHeap->capacity = capacity;
+
+    minHeap->array = (struct MinHeapNode**)malloc(
+        minHeap->capacity * sizeof(struct MinHeapNode*));
+    return minHeap;
+}
+
+void swapMinHeapNode(struct MinHeapNode** a,
+                     struct MinHeapNode** b)
+
+{
+
+    struct MinHeapNode* t = *a;
+    *a = *b;
+    *b = t;
+}
+
+void minHeapify(struct MinHeap* minHeap, int idx)
+
+{
+
+    int smallest = idx;
+    int left = 2 * idx + 1;
+    int right = 2 * idx + 2;
+
+    if (left < minHeap->size
+        && minHeap->array[left]->freq
+               < minHeap->array[smallest]->freq)
+        smallest = left;
+
+    if (right < minHeap->size
+        && minHeap->array[right]->freq
+               < minHeap->array[smallest]->freq)
+        smallest = right;
+
+    if (smallest != idx) {
+        swapMinHeapNode(&minHeap->array[smallest],
+                        &minHeap->array[idx]);
+        minHeapify(minHeap, smallest);
+    }
+}
+int isSizeOne(struct MinHeap* minHeap)
+{
+
+    return (minHeap->size == 1);
+}
+
+struct MinHeapNode* extractMin(struct MinHeap* minHeap)
+
+{
+
+    struct MinHeapNode* temp = minHeap->array[0];
+    minHeap->array[0] = minHeap->array[minHeap->size - 1];
+
+    --minHeap->size;
+    minHeapify(minHeap, 0);
+
+    return temp;
+}
+
+void insertMinHeap(struct MinHeap* minHeap,struct MinHeapNode* minHeapNode)
+{
+    ++minHeap->size;
+    int i = minHeap->size - 1;
+
+    while (i
+           && minHeapNode->freq
+                  < minHeap->array[(i - 1) / 2]->freq) {
+
+        minHeap->array[i] = minHeap->array[(i - 1) / 2];
+        i = (i - 1) / 2;
+    }
+
+    minHeap->array[i] = minHeapNode;
+}
+
+void buildMinHeap(struct MinHeap* minHeap)
+
+{
+
+    int n = minHeap->size - 1;
+    int i;
+
+    for (i = (n - 1) / 2; i >= 0; --i)
+        minHeapify(minHeap, i);
+}
+
+void printArr(int arr[], int n)
+{
+    int i;
+    for (i = 0; i < n; ++i)
+        printf("%d", arr[i]);
+
+    printf("\n");
+}
+int isLeaf(struct MinHeapNode* root)
+
+{
+
+    return !(root->left) && !(root->right);
+}
+
+struct MinHeap* createAndBuildMinHeap(char data[],int freq[], int size)
+
+{
+
+    struct MinHeap* minHeap = createMinHeap(size);
+
+    for (int i = 0; i < size; ++i)
+        minHeap->array[i] = newNode(data[i], freq[i]);
+
+    minHeap->size = size;
+    buildMinHeap(minHeap);
+
+    return minHeap;
+}
+struct MinHeapNode* buildHuffmanTree(char data[],
+                                     int freq[], int size)
+
+{
+    struct MinHeapNode *left, *right, *top;
+    struct MinHeap* minHeap= createAndBuildMinHeap(data, freq, size);
+    while (!isSizeOne(minHeap)) {
+        left = extractMin(minHeap);
+        right = extractMin(minHeap);
+        top = newNode('$', left->freq + right->freq);
+
+        top->left = left;
+        top->right = right;
+
+        insertMinHeap(minHeap, top);
+    }
+    return extractMin(minHeap);
+}
+void printCodes(struct MinHeapNode* root, int arr[],
+                int top)
+
+{
+    if (root->left) {
+
+        arr[top] = 0;
+        printCodes(root->left, arr, top + 1);
+    }
+
+    if (root->right) {
+
+        arr[top] = 1;
+        printCodes(root->right, arr, top + 1);
+    }
+    if (isLeaf(root)) {
+
+        printf("%c: ", root->data);
+        printArr(arr, top);
+    }
+}
+void HuffmanCodes(char data[], int freq[], int size)
+
+{
+    struct MinHeapNode* root
+        = buildHuffmanTree(data, freq, size);
+
+    int arr[MAX_TREE_HT], top = 0;
+
+    printCodes(root, arr, top);
+}
+int main()
+{
+    int n,i;
+    printf("Enter the number of characters you wanted to encode <27");
+    scanf("%d",&n);
+    char arr[26];
+    char c;
+    int freq[26];
+    printf("Enter the characters and their frequency\n");
+    for(i=0;i<n;i++)
+    {
+        scanf("\n%c %d",&c,&freq[i]);
+        arr[i]=c;
+    }
+    int size = sizeof(arr) / sizeof(arr[0]);
+    HuffmanCodes(arr, freq, n);
+
+    return 0;
+}
+-----------------------------------------------------------------------
+#include<stdio.h>
+
+struct st
+{
+    int weight,value;
+};
+
+int main()
+{
+   int n,i,j,k,W;
+   int b[100][101];
+   struct st pairof[1000],t;
+   printf("Enter number of items\n");
+   scanf("%d",&n);
+   printf("Enter the weight of Knapsack\n");
+   scanf("%d",&W);
+   printf("Enter %d items\n",n);
+   for(i=0;i<n;i++)
+   {
+       printf("Enter weight of an item");
+       scanf("%d",&pairof[i].weight);
+       
+       printf("Enter value of the item");
+       scanf("%d",&pairof[i].value);
+   }
+   for(i=0;i<n;i++)
+   {
+       for(j=i+1;j<n;j++)
+       {
+           if(pairof[i].weight>pairof[j].weight)
+           {
+               t=pairof[i];
+               pairof[i]=pairof[j];
+               pairof[j]=t;
+           }
+       }
+   }
+   for(j=0;j<=W;j++)
+   {
+        b[0][j]=0;
+   }
+   for(j=0;j<=n;j++)
+   {
+        b[j][0]=0;
+   }
+   printf("\n");
+   for(i=1;i<=n;i++)
+   {
+       for(j=1;j<=W;j++)
+       {
+           if(pairof[i-1].weight>j)
+           {
+               b[i][j]=b[i-1][j];
+           }
+           else
+           {
+               if(b[i-1][j]>b[i-1][j-pairof[i-1].weight]+pairof[i-1].value)
+               {
+                   b[i][j]=b[i-1][j];
+               }
+               else
+               {
+                   b[i][j]=b[i-1][j-pairof[i-1].weight]+pairof[i-1].value;
+               }
+           }
+       }
+   }
+   i=n;
+   for(j=W;j>0;)
+   { 
+       if(i==0)
+            break;
+        if(b[i ][j]==b[i-1][j])
+        { 
+               i--;
+         } 
+         else 
+         { 
+               printf("%d ",pairof[i-1].weight); 
+               j=j-pairof[i-1].weight;
+               i--; 
+         }
+   }
+   printf("\n%d\n",b[n][W]);
+   return 0;
+}
+----------------------------------------------------------------------------
+#include<stdio.h>
+ 
+int ary[10][10],completed[10],n,cost=0;
+ 
+void takeInput()
+{
+	int i,j;
+ 
+	printf("Enter the number of villages: ");
+	scanf("%d",&n);
+ 
+	printf("\nEnter the Cost Matrix\n");
+ 
+	for(i=0;i < n;i++)
+	{
+		printf("\nEnter Elements of Row: %d\n",i+1);
+ 
+		for( j=0;j < n;j++)
+			scanf("%d",&ary[i][j]);
+ 
+		completed[i]=0;
+	}
+ 
+	printf("\n\nThe cost list is:");
+ 
+	for( i=0;i < n;i++)
+	{
+		printf("\n");
+ 
+		for(j=0;j < n;j++)
+			printf("\t%d",ary[i][j]);
+	}
+}
+ 
+void mincost(int city)
+{
+	int i,ncity;
+ 
+	completed[city]=1;
+ 
+	printf("%d--->",city+1);
+	ncity=least(city);
+ 
+	if(ncity==999)
+	{
+		ncity=0;
+		printf("%d",ncity+1);
+		cost+=ary[city][ncity];
+ 
+		return;
+	}
+ 
+	mincost(ncity);
+}
+ 
+int least(int c)
+{
+	int i,nc=999;
+	int min=999,kmin;
+ 
+	for(i=0;i < n;i++)
+	{
+		if((ary[c][i]!=0)&&(completed[i]==0))
+			if(ary[c][i]+ary[i][c] < min)
+			{
+				min=ary[i][0]+ary[c][i];
+				kmin=ary[c][i];
+				nc=i;
+			}
+	}
+ 
+	if(min!=999)
+		cost+=kmin;
+ 
+	return nc;
+}
+ 
+int main()
+{
+	takeInput();
+ 
+	printf("\n\nThe Path is:\n");
+	mincost(0); //passing 0 because starting vertex
+ 
+	printf("\n\nMinimum cost is %d\n ",cost);
+ 
+	return 0;
+}
+-----------------------------------------------------------------
+TSP:
+#include<stdio.h>
+
+int a[100][100]={0},visited[100]={0},cost=0,no_v=0,n,min_cost=1000000;
+int b[100],st,c[100];
+
+void TSP(int s)
+{
+    int i,j,k,cost_s,ini,p;
+    cost_s=cost;
+    b[st++]=s;
+    visited[s-1]=1;
+    ini=no_v;
+    no_v+=1;
+    for(i=0;i<n;i++)
+    {
+        cost=cost_s;
+        if(i!=s-1 && visited[i]!=1)
+        {
+            k=a[s-1][i];
+            cost=cost+k;
+            TSP(i+1);
+            if(no_v==n && cost+a[i][0]<min_cost)
+            {
+                min_cost=cost+a[i][0];
+                for(p=0;p<n;p++)
+                {
+                    c[p]=b[p];
+                }
+                c[n]=b[0];
+            }
+            no_v--;
+            visited[i]=0;
+            st--;
+        }
+    }
+}
+
+int main()
+{
+   int i,j,k;
+   int b[100];
+   scanf("%d",&n);
+   for(i=0;i<n;i++)
+   {
+       for(j=0;j<n;j++)
+       {
+           printf("Enter the cost of travelling from city %d to %d\n",i,j);
+           scanf("%d",&a[i][j]);
+       }
+   }
+   st=0;
+   TSP(1);
+   printf("%d\n", min_cost);
+   for(i=0;i<n+1;i++)
+   {
+        printf("%d ",c[i]);
+   }
+   return 0;
+}
+-------------------------------------------------------------------------------
+JOB SEQUENCE:
+#include<stdio.h>
+#include<string.h>
+
+struct Job{
+    char no[100];
+    int deadline,profit;
+};
+
+int main()
+{
+    struct Job Default;
+    Default.no[0]='N';
+    Default.no[1]='U';
+    Default.no[2]='L';
+    Default.no[3]='L';
+    Default.deadline=0;
+    Default.profit=0;
+    struct Job job[1000],te,order[1000];
+    int n,i,j,dmax,maxprofit=0,curr_dead;
+    scanf("%d",&n);
+    dmax=-1;
+    for(i=0;i<n;i++)
+    {
+        printf("Enter job name");
+        scanf("%s",job[i].no);
+        printf("Enter deadline");
+        scanf("%d",&job[i].deadline);
+        if(dmax<job[i].deadline)
+        {
+            dmax=job[i].deadline;
+        }
+        printf("Enter profit");
+        scanf("%d",&job[i].profit);
+    }
+    for(i=0;i<n;i++)
+    {
+        for(j=i+1;j<n;j++)
+        {
+            if(job[i].profit<job[j].profit)
+            {
+                te=job[i];
+                job[i]=job[j];
+                job[j]=te;
+            }
+        }
+    }
+    for(i=0;i<=dmax;i++)
+    {
+        order[i]=Default;
+    }
+    for(i=0;i<n;i++)
+    {
+        curr_dead=job[i].deadline;
+        while(strcmp(order[curr_dead].no,Default.no)!=0 && order[curr_dead].deadline!=Default.deadline && order[curr_dead].profit!=Default.profit)
+        {
+            curr_dead-=1;
+        }
+        if(curr_dead!=0)
+        order[curr_dead]=job[i];
+    }
+    for(i=1;i<=dmax;i++)
+    {
+        printf("%s is Job name, %d is Job deadline, %d is Job profit\n",order[i].no,order[i].deadline,order[i].profit);
+          maxprofit+=order[i].profit;
+    }
+    printf("%d is the maximum profit achievable", maxprofit);
+    return 0;
+}
+---------------------------------------------------------------------------
+still have few programs left(copy from sahithi lokineni chat)
