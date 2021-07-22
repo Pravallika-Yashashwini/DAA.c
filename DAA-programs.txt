@@ -416,79 +416,48 @@ int main()
 PRIMS:
 
 #include<stdio.h>
-#include<stdlib.h>
-#define infinity 9999
-#define MAX 20
-int G[MAX][MAX],spanning[MAX][MAX],n;
-int prims()
+#include<stdio.h>
+#include<conio.h>
+int a,b,u,v,n,i,j,ne=1;
+int visited[10]={0},min,mincost=0, cost[10][10];
+void main()
 {
-    int cost[MAX][MAX];
-    int u,v,min_distance,distance[MAX],from[MAX];
-    int visited[MAX],no_of_edges,i,min_cost,j;
-    for(i=0;i<n;i++)
-    for(j=0;j<n;j++)
-    {
-    if(G[i][j]==0)
-    cost[i][j]=infinity;
-    else
-    cost[i][j]=G[i][j];
-    spanning[i][j]=0;
-    }
-    distance[0]=0;
-    visited[0]=1;
-    for(i=1;i<n;i++)
-    {
-        distance[i]=cost[0][i];
-        from[i]=0;
-        visited[i]=0;
-    }
-    min_cost=0;
-    no_of_edges=n-1;
-    while(no_of_edges>0)
-    {
-    min_distance=infinity;
-    for(i=1;i<n;i++)
-    if(visited[i]==0&&distance[i]<min_distance)
-    {
-        v=i;
-        min_distance=distance[i];
-    }
-    u=from[v];
-    spanning[u][v]=distance[v];
-    spanning[v][u]=distance[v];
-    no_of_edges--;
-    visited[v]=1;
-    for(i=1;i<n;i++)
-    if(visited[i]==0&&cost[i][v]<distance[i])
-    {
-        distance[i]=cost[i][v];
-        from[i]=v;
-    }
-        min_cost=min_cost+cost[u][v];
-    }
-    return(min_cost);
-}
-int main()
-{
-    int i,j,total_cost;
-    printf("Enter no. of vertices:");
+    
+    printf("enter the number of nodes");
     scanf("%d",&n);
-    printf("\nEnter the adjacency matrix:\n");
-    for(i=0;i<n;i++)
-    for(j=0;j<n;j++)
-    scanf("%d",&G[i][j]);
-    total_cost=prims();
-    printf("\nspanning tree matrix:\n");
-    for(i=0;i<n;i++)
+    printf("enter the adjacency matrix");
+    for(i=1;i<=n;i++)
+    for(j=1;j<=n;j++)
     {
-        printf("\n");
-        for(j=0;j<n;j++)
-            printf("%d\t",spanning[i][j]);
+        scanf("%d",&cost[i][j]);
+        if(cost[i][j]==0)
+        cost[i][j]=999;
     }
-    printf("\n\nTotal cost of spanning tree=%d",total_cost);
-    return 0;
+    visited[1]=1;
+    printf("\n");
+    while(ne<n)
+    {
+        for(i=1,min=999;i<=n;i++)
+        for(j=1;j<=min;j++)
+        if(cost[i][j]<min)
+        if(visited[i]!=0)
+        {
+            min=cost[i][j];
+            a=u=i;
+            b=v=j;
+            if(visited[u]==0||visited[v]==0)
+            {
+                printf("\n edge %d:(%d %d)cost:%d",ne++,a,b,min);
+                mincost += min;
+                visited[b]=1;
+            }
+            cost[a][b]=cost[b][a]=999;
+        }
+        printf("\n minimum cost=%d",mincost);
+        getch();
+    }
 }
------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
 DIJKSTRA'S:
 #include<stdio.h>
 
